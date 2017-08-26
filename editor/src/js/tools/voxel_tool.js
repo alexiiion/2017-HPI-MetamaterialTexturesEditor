@@ -10,10 +10,10 @@ const THREE = require('three');
 
 module.exports = (function() {
 
-  function VoxelTool(renderer, voxelGrid) {
+  function VoxelTool(renderer, voxelModel) {
     Tool.call(this, renderer);
 
-    this.voxelGrid = voxelGrid;
+    this.voxelModel = voxelModel;
     this.startPosition = new THREE.Vector3();
     this.endPosition = new THREE.Vector3();
 
@@ -25,14 +25,14 @@ module.exports = (function() {
     this.stiffness = 0.01;
 
     this.minPosition = new THREE.Vector3(
-      -(this.voxelGrid.size.x / 2 - 0.5),
+      -(this.voxelModel.size.x / 2 - 0.5),
       0.5,
-      -(this.voxelGrid.size.z / 2 - 0.5)
+      -(this.voxelModel.size.z / 2 - 0.5)
     );
     this.maxPosition = new THREE.Vector3(
-      this.voxelGrid.size.x / 2 - 0.5,
-      this.voxelGrid.size.y - 0.5,
-      this.voxelGrid.size.z / 2 - 0.5
+      this.voxelModel.size.x / 2 - 0.5,
+      this.voxelModel.size.y - 0.5,
+      this.voxelModel.size.z / 2 - 0.5
     );
 
     this.cursor = this.buildCursor();
@@ -217,22 +217,22 @@ module.exports = (function() {
           this.savedEndPosition = this.endPosition.clone();
           this.mouseMoveUp = this.processCube;
           this.mouseMoveDown = this.processCube;
-          this.mouseUp = this.updateVoxelGrid;
+          this.mouseUp = this.updatevoxelModel;
         }.bind(this);
       } else {
-        this.mouseUp = this.updateVoxelGrid;
+        this.mouseUp = this.updatevoxelModel;
       }
     } else {
       this.mouseMoveUp = this.processSingle;
       this.mouseMoveDown = null;
-      this.mouseUp = this.updateVoxelGrid;
+      this.mouseUp = this.updatevoxelModel;
     }
 
     this.processSingle();
   }
 
   VoxelTool.prototype.processSingle = function() {
-    const intersectionVoxels = _.values(this.voxelGrid.intersectionVoxels);
+    const intersectionVoxels = _.values(this.voxelModel.intersectionVoxels);
     const intersection = this.raycaster.intersectObjects(intersectionVoxels)[0];
 
     if (!intersection) {
@@ -345,7 +345,7 @@ module.exports = (function() {
 
   VoxelTool.prototype.updateCursor = function() {}
 
-  VoxelTool.prototype.updateVoxelGrid = function() {
+  VoxelTool.prototype.updatevoxelModel = function() {
     if (!this.startPosition || !this.endPosition || !this.cuboidMode && this.hasMoved) {
       this.processSingle();
       return;
@@ -394,13 +394,13 @@ module.exports = (function() {
       voxel.enhanceEdges();
     });
 
-    this.voxelGrid.update();
+    this.voxelModel.update();
     this.setCuboidMode(this.cuboidMode, this.rotatedMode);
     this.processSingle();
-    // this.voxelGrid.highlightHinges();
+    // this.voxelModel.highlightHinges();
 
-    // this.voxelGrid.detectBadVoxels();
-    // this.voxelGrid.highlightBadVoxels();
+    // this.voxelModel.detectBadVoxels();
+    // this.voxelModel.highlightBadVoxels();
     // addBorderingIfNeeded( this );
   }
 
