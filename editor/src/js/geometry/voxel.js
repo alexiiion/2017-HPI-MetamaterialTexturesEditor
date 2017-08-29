@@ -13,6 +13,7 @@ module.exports = (function() {
         this.compressionRatio = 0;
         this.hingeDistance = 0.0;
         this.hingeOffset = 0.0;
+        this.hingePosition = 0.0;
 
         this.hingeMaterial = new THREE.LineBasicMaterial( {
             color: 0x000000,
@@ -67,6 +68,9 @@ module.exports = (function() {
         const maxHingeOffset = .5 * 0.5;
         const currentHalfHingeOffset = maxHingeOffset * this.hingeOffset;
 
+        const maxHingePosition = .5 * .5;
+        const currentHalfHingePosition = maxHingePosition * this.hingePosition;
+
         const cornerA = new THREE.Vector3(-currentLength, 0, -.5);
         const cornerB = new THREE.Vector3(currentLength, 0, -.5);
         const cornerC = new THREE.Vector3(currentLength, 0, .5);
@@ -89,10 +93,14 @@ module.exports = (function() {
         const maxHingeDistance = maxForeShortening * 0.5;
         const currentHalfHingeDistance = maxHingeDistance * this.hingeDistance / 2.0;
         const tension = Math.min(this.hingeDistance, 0.5);
-
+        
         //BACK HINGE
-        const topALeft = new THREE.Vector3(0 - currentHalfHingeDistance, currentHeight, -.5);
-        const topARight = new THREE.Vector3(0 + currentHalfHingeDistance, currentHeight, -.5);
+        const topALeft = new THREE.Vector3(0 - currentHalfHingeDistance + currentHalfHingePosition, 
+                                            currentHeight, 
+                                            -.5);
+        const topARight = new THREE.Vector3(0 + currentHalfHingeDistance + currentHalfHingePosition, 
+                                            currentHeight, 
+                                            -.5);
         
         var positions = [];
         positions.push(new THREE.Vector3(cornerA.x + currentHalfHingeOffset, cornerA.y, cornerA.z));
@@ -112,8 +120,12 @@ module.exports = (function() {
         this.meshes.push(hingeA);
 
         //FRONT HINGE
-        const topBLeft = new THREE.Vector3(0 - currentHalfHingeDistance, currentHeight, .5);
-        const topBRight = new THREE.Vector3(0 + currentHalfHingeDistance, currentHeight, .5);
+        const topBLeft = new THREE.Vector3(0 - currentHalfHingeDistance +  currentHalfHingePosition
+                                            , currentHeight, 
+                                            .5);
+        const topBRight = new THREE.Vector3(0 + currentHalfHingeDistance +  currentHalfHingePosition, 
+                                            currentHeight, 
+                                            .5);
 
         positions = [];
         positions.push(new THREE.Vector3(cornerC.x - currentHalfHingeOffset, cornerC.y, cornerC.z));
@@ -169,6 +181,11 @@ module.exports = (function() {
     Voxel.prototype.updateHingeOffset = function(value)
     {
         this.hingeOffset = value;
+    };
+
+    Voxel.prototype.updateHingePosition = function(value)
+    {
+        this.hingePosition = value;
     };
 
     Voxel.prototype.updateDrawing = function(scene)

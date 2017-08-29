@@ -58,6 +58,7 @@ module.exports = (function() {
     
     $("#setHingeDistance").on("input change", this.changeHingeDistanceValue);
     $("#setHingeOffset").on("input change", this.changeHingeOffsetValue);
+    $("#setHingePosition").on("input change", this.changeHingePositionValue);
 
     $("#setCompression").on("input change", this.changeCompressionValue);
     
@@ -95,6 +96,14 @@ module.exports = (function() {
     $('#slider-value-hinge-offset').text(value);
 
     this.voxelModel.updateHingeOffset(value);
+  }
+  
+  Controls.prototype.changeHingePositionValue = function(evt) {
+    var slider =  $('#setHingePosition');
+    const value = slider.val();
+    $('#slider-value-hinge-position').text(value);
+
+    this.voxelModel.updateHingePosition(value);
   }
   
 
