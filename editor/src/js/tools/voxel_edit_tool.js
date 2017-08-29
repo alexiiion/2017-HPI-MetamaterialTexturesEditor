@@ -11,22 +11,23 @@ module.exports = (function() {
     bind(this);
     VoxelTool.call(this, renderer, voxelModel);
 
-    this.cursor.material.uniforms.tool.value = 2;
+    // this.cursor.material.uniforms.tool.value = 2;
     this.allowCube = false;
 
-    this.setCuboidMode(true, false);
+    this.setRectMode(true);
   }
 
   VoxelEditTool.prototype = Object.create(VoxelTool.prototype);
 
-  // VoxelEditTool.prototype.extrusionParametersFromIntersection = function(intersection) {
-  //   return intersection.object.isPlane ? {
-  //     startPosition: undefined
-  //   } : {
-  //     startPosition: intersection.object.position.clone(),
-  //     extrusionNormal: intersection.face.normal.clone()
-  //   }
-  // }
+  VoxelEditTool.prototype.extrusionParametersFromIntersection = function(intersection) {
+    return intersection.object.isPlane ? {
+      startPosition: undefined,
+      extrusionNormal: new THREE.Vector3(0.0, -1.0, 0.0)
+    } : {
+      startPosition: intersection.object.position.clone(),
+      extrusionNormal: new THREE.Vector3(0.0, -1.0, 0.0)
+    }
+  }
 
   // VoxelEditTool.prototype.updateCursor = function() {
   //   this.cursor.scale.setComponent(this.extrusionComponent, 0.1);
@@ -54,6 +55,22 @@ module.exports = (function() {
 
   //   return voxels;
   // }
+  VoxelEditTool.prototype.updateVoxel = function(position, cellCoords, cellType) {
+    // const voxel = this.voxelModel.getVoxel(position, cellCoords);
+    // var voxel;
+    // const voxels = [];
+
+    // while ((voxel = this.voxelModel.voxelAtPosition(position)) && (!this.mirror[direction] ||  mirrorFactor * position.getComponent(direction) > 0)) {
+    //   voxel.update(features, direction);
+    //   voxel.setStiffness(this.stiffness);
+    //   voxels.push(voxel);
+    //   position.sub(extrusionNormal);
+    // }
+
+    // this.activeBrush.used = true;
+
+    // return voxels;
+  };
 
   return VoxelEditTool;
 

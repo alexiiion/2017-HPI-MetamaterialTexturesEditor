@@ -10,24 +10,25 @@ module.exports = (function() {
     bind(this);
     VoxelTool.call(this, renderer, voxelModel);
 
-    this.setCuboidMode(true, false);
+    this.setRectMode(true);
+    // this.setCuboidMode(true, false);
   }
 
   VoxelAddTool.prototype = Object.create(VoxelTool.prototype);
 
-  // // VoxelAddTool.prototype.extrusionParametersFromIntersection = function(intersection) {
-  // //   return intersection.object.isPlane ? {
-  // //     startPosition: intersection.point.floor().addScalar(0.5),
-  // //     extrusionNormal: new THREE.Vector3(0.0, 1.0, 0.0)
-  // //   } : {
-  // //     startPosition: intersection.object.position.clone().add(intersection.face.normal),
-  // //     extrusionNormal: intersection.face.normal.clone()
-  // //   }
-  // // }
+  VoxelAddTool.prototype.extrusionParametersFromIntersection = function(intersection) {
+    return intersection.object.isPlane ? {
+      startPosition: intersection.point.floor().addScalar(0.5),
+      extrusionNormal: new THREE.Vector3(0.0, 1.0, 0.0)
+    } : {
+      startPosition: intersection.object.position.clone(),
+      extrusionNormal: intersection.face.normal.clone()
+    }
+  }
 
-  // VoxelAddTool.prototype.extrusionLengthFromIntersection = function(intersection) {
-  //   return Math.max(Math.round(intersection), 0.0);
-  // }
+  VoxelAddTool.prototype.extrusionLengthFromIntersection = function(intersection) {
+    return Math.max(Math.round(intersection), 0.0);
+  }
 
   // // This break the current selection and acts as a reset.
   // // It is more like a hack.
@@ -35,12 +36,13 @@ module.exports = (function() {
   //   this.setCuboidMode(true, false);
   // }
 
-  VoxelAddTool.prototype.updateVoxel = function(position, features) {
-    const voxel = this.voxelModel.addVoxel(position, features, this.extrusionNormal.largestComponent(), this.stiffness);
+  VoxelAddTool.prototype.updateVoxel = function(position, cellCoords, cellType) {
+    const voxel = this.voxelModel.add(position, cellCoords, cellType);
+    // const voxel = this.voxelModel.addVoxel(position, features, this.extrusionNormal.largestComponent(), this.stiffness);
 
-    this.activeBrush.used = true;
+    // this.activeBrush.used = true;
 
-    return [ voxel ];
+    return voxel;
   }
 
   return VoxelAddTool;

@@ -11,27 +11,27 @@ module.exports = (function() {
     bind(this);
     VoxelTool.call(this, renderer, voxelModel);
 
-    this.setCuboidMode(true, false);
+    this.setRectMode(true);
 
     this.cursorBorder = 0.5;
 
-    this.cursor.material.uniforms.color.value = new THREE.Color(0xffffff);
-    this.cursor.material.uniforms.borderColor.value = new THREE.Color(0xdddddd);
-    this.cursor.material.uniforms.tool.value = 1;
-    this.cursor.material.uniforms.borderSize.value = this.cursorBorder / 2.0;
+    // this.cursor.material.uniforms.color.value = new THREE.Color(0xffffff);
+    // this.cursor.material.uniforms.borderColor.value = new THREE.Color(0xdddddd);
+    // this.cursor.material.uniforms.tool.value = 1;
+    // this.cursor.material.uniforms.borderSize.value = this.cursorBorder / 2.0;
   }
 
   VoxelDeleteTool.prototype = Object.create(VoxelTool.prototype);
 
-  // VoxelDeleteTool.prototype.extrusionParametersFromIntersection = function(intersection) {
-  //   return intersection.object.isPlane ? {
-  //     startPosition: intersection.point.floor().addScalar(0.5),
-  //     extrusionNormal: new THREE.Vector3(0.0, -1.0, 0.0)
-  //   } : {
-  //     startPosition: intersection.object.position.clone(),
-  //     extrusionNormal: intersection.face.normal.clone()
-  //   }
-  // }
+  VoxelDeleteTool.prototype.extrusionParametersFromIntersection = function(intersection) {
+    return intersection.object.isPlane ? {
+      startPosition: intersection.point.floor().addScalar(0.5),
+      extrusionNormal: new THREE.Vector3(0.0, -1.0, 0.0)
+    } : {
+      startPosition: intersection.object.position.clone(),
+      extrusionNormal: new THREE.Vector3(0.0, -1.0, 0.0)
+    }
+  }
 
   // // This break the current selection and acts as a reset.
   // // It is more like a hack.
@@ -43,9 +43,13 @@ module.exports = (function() {
   //   return Math.min(Math.round(intersection), 0.0);
   // }
 
-  VoxelDeleteTool.prototype.updateVoxel = function(position) {
-    this.voxelModel.removeVoxel(position);
-    return [];
+  VoxelDeleteTool.prototype.updateVoxel = function(position, cellCoords, cellType) {
+    const voxel = this.voxelModel.removeVoxel(position, cellCoords);
+    
+    if(voxel != null)
+      voxel.removeVoxelFromScene();
+
+    return null;
   }
 
   return VoxelDeleteTool;

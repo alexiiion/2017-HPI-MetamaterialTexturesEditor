@@ -145,16 +145,22 @@ body {
 
 /* cells */
 
+
 .voxel-cells-btn {
   background-color: #ffffff;
   border: solid 0.25pt #B2B2B2;
   margin: 3px;
+  width: 65px;
 }
 
-.voxel-cells-btn .voxel-btn-img .voxel-btn-selection {
+.voxel-cells-btn.active {
+  border: solid 4px #00adee;
+}
+
+/* .voxel-cells-btn .voxel-btn-img .voxel-btn-selection {
   outline: solid 4px #00adee;
   margin: -10px;
-}
+} */
 
 .voxel-cells-btn .voxel-btn-img {
   padding: 10px;

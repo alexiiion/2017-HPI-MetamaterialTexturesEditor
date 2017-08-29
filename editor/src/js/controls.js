@@ -5,17 +5,19 @@ const FileSaver          = require('file-saver');
 
 const bind               = require('./misc/bind');
 
+// const AdvancedEditor     = require('./tools/advanced_editor');
 const VoxelAddTool       = require('./tools/voxel_add_tool');
 const VoxelDeleteTool    = require('./tools/voxel_delete_tool');
 const VoxelEditTool      = require('./tools/voxel_edit_tool');
 
 module.exports = (function() {
 
-  function Controls(renderer, voxelModel) {
+  function Controls(renderer, voxelGrid) {
     bind(this);
 
     this.renderer = renderer;
-    this.voxelModel = voxelModel;
+    this.voxelGrid = voxelGrid;
+    //this.simulation = simulation;
 
     this.cellSize = 5.0;
     this.minThickness = 0.4;
@@ -26,13 +28,14 @@ module.exports = (function() {
     $('#voxel-export-btn').click(this.export);
 
     this.tools = {
-      'add-tool': new VoxelAddTool(this.renderer, this.voxelModel),
-      'delete-tool': new VoxelDeleteTool(this.renderer, this.voxelModel),
-      'edit-tool': new VoxelEditTool(this.renderer, this.voxelModel),
+      'add-tool': new VoxelAddTool(this.renderer, this.voxelGrid),
+      'delete-tool': new VoxelDeleteTool(this.renderer, this.voxelGrid),
+      'edit-tool': new VoxelEditTool(this.renderer, this.voxelGrid)
     };
 
     $('.voxel-tool-btn').click(this.selectTool);
     $('#voxel-mirror-btn').click(this.toggleMirrorMode);
+    // $('.voxel-stiffness-btn').click(this.selectStiffness);
 
     window.addEventListener('keydown', this.onKeyDown);
     window.addEventListener('keyup', this.onKeyUp);
@@ -44,6 +47,14 @@ module.exports = (function() {
 
     $('#import-cellsize').blur(this.parseGridSettings);
     $('#import-thickness').blur(this.parseGridSettings);
+
+    // this.advancedEditor = new AdvancedEditor([
+    //   this.tools['add-tool'],
+    //   this.tools['delete-tool'],
+    //   this.tools['edit-tool']
+    // ]);
+
+    $('.voxel-cells-btn').click(this.selectCellType);
 
     this.parseGridSettings();
   }
@@ -57,6 +68,18 @@ module.exports = (function() {
     this.activeTool.deactivate();
     this.activeTool = this.tools[toolName];
     this.activeTool.activate();
+  }
+
+  Controls.prototype.selectCellType = function(evt) {
+    const cellTypeName = typeof evt == 'string' ? evt : evt.currentTarget.id.substr(-1);
+
+    $('.voxel-cells-btn').removeClass('active');
+    $('#voxel-cells-container-' + cellTypeName).addClass('active');
+
+    this.setCurrentCellType(cellTypeName);
+    // this.activeTool.deactivate();
+    // this.activeTool = this.tools[toolName];
+    // this.activeTool.activate();
   }
 
   Controls.prototype.toggleMirrorMode = function(evt) {
@@ -73,22 +96,22 @@ module.exports = (function() {
     }
   }
 
-  // Controls.prototype.alterMouseEvents = function() {
-  //   this.tools['smoothing-tool'].alterMouseEvents();
-  // }
+  Controls.prototype.alterMouseEvents = function() {
+    
+  }
 
-  Controls.prototype.setCuboidMode = function(cuboidMode) {
-    this.cuboidMode = cuboidMode;
+  Controls.prototype.setRectMode = function(enableRect)
+  {    
+    this.tools['add-tool'].setRectMode(enableRect);
+    this.tools['delete-tool'].setRectMode(enableRect);
+    this.tools['edit-tool'].setRectMode(enableRect);
+  };
 
-    this.tools['add-tool'].setCuboidMode(this.cuboidMode);
-    this.tools['delete-tool'].setCuboidMode(this.cuboidMode);
-    this.tools['edit-tool'].setCuboidMode(this.cuboidMode);
-
-    if (this.cuboidMode) {
-      $('#voxel-cuboid-btn').addClass('active');
-    } else {
-      $('#voxel-cuboid-btn').removeClass('active');
-    }
+  Controls.prototype.setCurrentCellType = function(cellType)
+  {
+    this.tools['add-tool'].setCurrentCellType(cellType);
+    this.tools['delete-tool'].setCurrentCellType(cellType);
+    this.tools['edit-tool'].setCurrentCellType(cellType);
   }
 
   Controls.prototype.toggleAddDelete = function() {
@@ -102,31 +125,31 @@ module.exports = (function() {
     }
   }
 
-  // Controls.prototype.selectStiffness = function(evt) {
-  //   const stiffness = parseInt(evt.currentTarget.id.slice(16, -4)) / 100.0;
+  Controls.prototype.selectStiffness = function(evt) {
+    const stiffness = parseInt(evt.currentTarget.id.slice(16, -4)) / 100.0;
 
-  //   $('.voxel-stiffness-btn').removeClass('active');
-  //   $(evt.currentTarget).addClass('active');
+    $('.voxel-stiffness-btn').removeClass('active');
+    $(evt.currentTarget).addClass('active');
 
-  //   this.tools['add-tool'].stiffness = stiffness;
-  //   this.tools['edit-tool'].stiffness = stiffness;
-  // }
+    this.tools['add-tool'].stiffness = stiffness;
+    this.tools['edit-tool'].stiffness = stiffness;
+  }
 
-  // Controls.prototype.import = function() {
-  //   $('<input type="file" >').on('change', function(event) {
-  //     var file = event.target.files[0];
-  //     if (file) {
-  //       var reader = new FileReader();
-  //       reader.onload = function() {
-  //         this.voxelModel.import(reader.result, this.cellSize);
-  //       }.bind(this);
-  //       reader.readAsArrayBuffer(file);
-  //     }
-  //   }.bind(this)).click();
-  // }
+  Controls.prototype.import = function() {
+    $('<input type="file" >').on('change', function(event) {
+      var file = event.target.files[0];
+      if (file) {
+        var reader = new FileReader();
+        reader.onload = function() {
+          this.voxelGrid.import(reader.result, this.cellSize);
+        }.bind(this);
+        reader.readAsArrayBuffer(file);
+      }
+    }.bind(this)).click();
+  }
 
   Controls.prototype.export = function() {
-    var stlBinary = this.voxelModel.export().toStlBinary();
+    var stlBinary = this.voxelGrid.export().toStlBinary();
     FileSaver.saveAs(stlBinary, 'export.stl');
   }
 
@@ -142,7 +165,7 @@ module.exports = (function() {
         this.toggleAddDelete();
         break;
       case 17:
-        this.setCuboidMode(false);
+        this.setRectMode(false);
         this.alterMouseEvents();
         break;
     }
@@ -156,7 +179,7 @@ module.exports = (function() {
         this.toggleAddDelete();
         break;
       case 17:
-        this.setCuboidMode(true);
+        this.setRectMode(true);
         this.alterMouseEvents();
         break;
       case 27:
@@ -166,8 +189,8 @@ module.exports = (function() {
   }
 
   Controls.prototype.parseGridSettings = function() {
-    this.voxelModel.cellSize = this.cellSize = parseFloat($('#import-cellsize').val());
-    this.voxelModel.minThickness = this.minThickness = parseFloat($('#import-thickness').val());
+    this.voxelGrid.cellSize = this.cellSize = parseFloat($('#import-cellsize').val());
+    this.voxelGrid.minThickness = this.minThickness = parseFloat($('#import-thickness').val());
   };
 
   return Controls;

@@ -74,6 +74,9 @@ module.exports = (function() {
     this.coordinateSystem.add(zAxis);
 
     this.scene.add(this.coordinateSystem);
+    
+    this.voxelContainer = new THREE.Object3D();
+    this.scene.add(this.voxelContainer);
   }
 
   Renderer.prototype.update = function() {
