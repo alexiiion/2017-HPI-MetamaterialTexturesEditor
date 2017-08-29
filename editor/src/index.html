@@ -95,6 +95,29 @@
 			</div>
 		</div>
 
+		<!-- simulation -->
+		<div class="panel">
+				<div class="panel-heading">
+					<h4 class="panel-title"><a data-target="#sim-collapse" data-toggle="collapse" href="#misc-collapse">simulation</a></h4>
+				</div>
+				<div class="panel-collapse collapse in" id="sim-collapse">
+					<div class="panel-body">
+						<div id="compression">
+							<!-- <input id="setCompression" type="text" data-slider-min="0" 
+									data-slider-max="1" data-slider-step=".01" data-slider-value="0"/>
+							<span id="currentSliderLabel">Current compression: <span id="sliderVal">0</span></span> -->
+							<input id="setCompression" type="range" min="0" max="1" step=".01" value="0" 
+									data-orientation="horizontal">							
+							<div class="compression-value">
+									current compression: <span id="slider-value">0</span>
+							</div>
+							<!-- <input id="ex1" data-slider-id='ex1Slider' type="text" 
+								data-slider-min="0" data-slider-max="20" data-slider-step="1" data-slider-value="14"/> -->
+						</div>
+					</div>
+				</div>
+		</div>
+
     <!-- import/export/grid -->
 		<div class="panel">
 			<div class="panel-heading">
@@ -119,6 +142,7 @@
 				</div>
 			</div>
 		</div>
+
 	</div>
 
 	<div id="alerts"></div>

@@ -12,11 +12,11 @@ const VoxelEditTool      = require('./tools/voxel_edit_tool');
 
 module.exports = (function() {
 
-  function Controls(renderer, voxelGrid) {
+  function Controls(renderer, voxelModel) {
     bind(this);
 
     this.renderer = renderer;
-    this.voxelGrid = voxelGrid;
+    this.voxelModel = voxelModel;
     //this.simulation = simulation;
 
     this.cellSize = 5.0;
@@ -28,16 +28,16 @@ module.exports = (function() {
     $('#voxel-export-btn').click(this.export);
 
     this.tools = {
-      'add-tool': new VoxelAddTool(this.renderer, this.voxelGrid),
-      'delete-tool': new VoxelDeleteTool(this.renderer, this.voxelGrid),
-      'edit-tool': new VoxelEditTool(this.renderer, this.voxelGrid)
+      'add-tool': new VoxelAddTool(this.renderer, this.voxelModel),
+      'delete-tool': new VoxelDeleteTool(this.renderer, this.voxelModel),
+      'edit-tool': new VoxelEditTool(this.renderer, this.voxelModel)
     };
 
     $('.voxel-tool-btn').click(this.selectTool);
     $('#voxel-mirror-btn').click(this.toggleMirrorMode);
     // $('.voxel-stiffness-btn').click(this.selectStiffness);
 
-    window.addEventListener('keydown', this.onKeyDown);
+        window.addEventListener('keydown', this.onKeyDown);
     window.addEventListener('keyup', this.onKeyUp);
 
     this.activeTool = this.tools['add-tool'];
@@ -55,8 +55,20 @@ module.exports = (function() {
     // ]);
 
     $('.voxel-cells-btn').click(this.selectCellType);
-
+    
+    $("#setCompression").on("input change", this.changeCompressionValue);
+   
     this.parseGridSettings();
+  }
+
+  Controls.prototype.changeCompressionValue = function(evt) {
+    var slider =  $('#setCompression');
+    const value = slider.val();
+    $('#slider-value').text(value);
+
+    this.voxelModel.updateCompression(value);
+
+    this.renderer.coordinateSystem.visible = !(value > 0);
   }
 
   Controls.prototype.selectTool = function(evt) {
@@ -141,7 +153,7 @@ module.exports = (function() {
       if (file) {
         var reader = new FileReader();
         reader.onload = function() {
-          this.voxelGrid.import(reader.result, this.cellSize);
+          this.voxelModel.import(reader.result, this.cellSize);
         }.bind(this);
         reader.readAsArrayBuffer(file);
       }
@@ -149,7 +161,7 @@ module.exports = (function() {
   }
 
   Controls.prototype.export = function() {
-    var stlBinary = this.voxelGrid.export().toStlBinary();
+    var stlBinary = this.voxelModel.export().toStlBinary();
     FileSaver.saveAs(stlBinary, 'export.stl');
   }
 
@@ -189,8 +201,8 @@ module.exports = (function() {
   }
 
   Controls.prototype.parseGridSettings = function() {
-    this.voxelGrid.cellSize = this.cellSize = parseFloat($('#import-cellsize').val());
-    this.voxelGrid.minThickness = this.minThickness = parseFloat($('#import-thickness').val());
+    this.voxelModel.cellSize = this.cellSize = parseFloat($('#import-cellsize').val());
+    this.voxelModel.minThickness = this.minThickness = parseFloat($('#import-thickness').val());
   };
 
   return Controls;

@@ -38,6 +38,15 @@ module.exports = (function() {
         return voxel;        
     };
 
+    VoxelModel.prototype.updateCompression = function(value)
+    {
+        for(var i = 0; i < this.elements.length; i++)
+        {
+            this.elements[i].updateCompression(value);
+            this.elements[i].updateDrawing();
+        }
+    };
+
     VoxelModel.prototype.removeVoxel = function(position, cellCoords)
     {
         var indexOfElementToRemove = -1;

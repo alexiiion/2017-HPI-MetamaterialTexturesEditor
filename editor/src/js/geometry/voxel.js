@@ -10,6 +10,7 @@ module.exports = (function() {
         this.cellCoords = cellCoords;
         this.cellType = cellType;
         this.meshes = [];
+        this.compressionRatio = 0;
         bind(this);
     }
 
@@ -36,34 +37,47 @@ module.exports = (function() {
             linejoin:  'round' //ignored by WebGLRenderer
         } );
 
+        const maxForeShortening = .5 * 0.75;
+        const currentForeShortening = maxForeShortening * this.compressionRatio;
+        const currentLength = .5 - currentForeShortening;
+        const currentHeight = Math.sqrt(Math.pow(.5, 2) - Math.pow(currentLength, 2));
+
+        const cornerA = new THREE.Vector3(-currentLength, 0, -.5);
+        const cornerB = new THREE.Vector3(currentLength, 0, -.5);
+        const cornerC = new THREE.Vector3(currentLength, 0, .5);
+        const cornerD = new THREE.Vector3(-currentLength, 0, .5);
+
         //outline
         var outlineGeometry = new THREE.Geometry();
-        outlineGeometry.vertices.push(new THREE.Vector3(-.5, 0, -.5));
-        outlineGeometry.vertices.push(new THREE.Vector3(.5, 0, -.5));
-        outlineGeometry.vertices.push(new THREE.Vector3(.5, 0, .5));
-        outlineGeometry.vertices.push(new THREE.Vector3(-.5, 0, .5));
-        outlineGeometry.vertices.push(new THREE.Vector3(-.5, 0, -.5));
+        outlineGeometry.vertices.push(cornerA);
+        outlineGeometry.vertices.push(cornerB);
+        outlineGeometry.vertices.push(cornerC);
+        outlineGeometry.vertices.push(cornerD);
+        outlineGeometry.vertices.push(cornerA);
 
         const outline = new THREE.Line( outlineGeometry, material );
-        outline.position.set(this.position.x + .5, this.position.y, this.position.z + .5);
-        scene.add(outline);
+        outline.position.set(this.position.x + .5 - this.position.x * currentForeShortening * 2, 
+                                this.position.y, this.position.z + .5);
+        this.scene.add(outline);
         this.meshes.push(outline);
-        
-        const elevation = .4;
+
+        const topA = new THREE.Vector3(0, currentHeight, -.5);
+        const topB = new THREE.Vector3(0, currentHeight, .5);
 
         var hingeGeometry = new THREE.Geometry();
-        hingeGeometry.vertices.push(new THREE.Vector3(-.5, 0, -.5));
-        hingeGeometry.vertices.push(new THREE.Vector3(0, elevation, -.5));
-        hingeGeometry.vertices.push(new THREE.Vector3(.5, 0, -.5));
-        hingeGeometry.vertices.push(new THREE.Vector3(0, elevation, -.5));
-        hingeGeometry.vertices.push(new THREE.Vector3(0, elevation, .5));
-        hingeGeometry.vertices.push(new THREE.Vector3(.5, 0, .5));
-        hingeGeometry.vertices.push(new THREE.Vector3(0, elevation, .5));
-        hingeGeometry.vertices.push(new THREE.Vector3(-.5, 0, .5));
+        hingeGeometry.vertices.push(cornerA);
+        hingeGeometry.vertices.push(topA);
+        hingeGeometry.vertices.push(cornerB);
+        hingeGeometry.vertices.push(topA);
+        hingeGeometry.vertices.push(topB);
+        hingeGeometry.vertices.push(cornerC);
+        hingeGeometry.vertices.push(topB);
+        hingeGeometry.vertices.push(cornerD);
 
         const hinge = new THREE.Line( hingeGeometry, material );
-        hinge.position.set(this.position.x + .5, this.position.y, this.position.z + .5);
-        scene.add(hinge);
+        hinge.position.set(this.position.x + .5 - this.position.x * currentForeShortening * 2, 
+                                this.position.y, this.position.z + .5);
+        this.scene.add(hinge);
         this.meshes.push(hinge);
 
         // const geometry = new THREE.PlaneGeometry(1.0, 1.0);
@@ -80,21 +94,20 @@ module.exports = (function() {
             for(var i = 0; i < this.meshes.length; i++)
                 this.scene.remove(this.meshes[i]);
 
-            this.scene = null;
             this.meshes = [];            
         }    
-    }
+    };
 
-    Voxel.prototype.setCompression = function(compressionRatio)
+    Voxel.prototype.updateCompression = function(compressionRatio)
     {
         this.compressionRatio = compressionRatio;
-    }
+    };
 
     Voxel.prototype.updateDrawing = function(scene)
     {
         this.removeVoxelFromScene();
-        this.drawVoxel(scene);
-    }
+        this.drawVoxel(this.scene);
+    };
 
     return Voxel;
 
