@@ -11,7 +11,8 @@ module.exports = (function() {
         this.cellType = cellType;
         this.meshes = [];
         this.compressionRatio = 0;
-        this.tension = 0.2;
+        this.hingeDistance = 0.0;
+        this.hingeOffset = 0.0;
 
         this.hingeMaterial = new THREE.LineBasicMaterial( {
             color: 0x000000,
@@ -21,12 +22,10 @@ module.exports = (function() {
         bind(this);
     }
 
-    Voxel.prototype.createHinge = function(positions, material)
-    {
-        const tension = this.tension;//Math.max(Math.min(this.compressionRatio, .3), .8);
-        
+    Voxel.prototype.createHinge = function(positions, material, tension)
+    {        
         var curve = new THREE.CatmullRomCurve3( positions );
-        curve.tension = 0;
+        curve.tension = tension;
         curve.type = "catmullrom";
         curve.closed = false;
 
@@ -65,6 +64,9 @@ module.exports = (function() {
         const currentLength = .5 - currentForeShortening;
         const currentHeight = Math.sqrt(Math.pow(.5, 2) - Math.pow(currentLength, 2));
 
+        const maxHingeOffset = .5 * 0.5;
+        const currentHalfHingeOffset = maxHingeOffset * this.hingeOffset;
+
         const cornerA = new THREE.Vector3(-currentLength, 0, -.5);
         const cornerB = new THREE.Vector3(currentLength, 0, -.5);
         const cornerC = new THREE.Vector3(currentLength, 0, .5);
@@ -84,22 +86,24 @@ module.exports = (function() {
         this.scene.add(outline);
         this.meshes.push(outline);
 
-        const topA = new THREE.Vector3(0, currentHeight, -.5);
-        const topB = new THREE.Vector3(0, currentHeight, .5);
+        const maxHingeDistance = maxForeShortening * 0.5;
+        const currentHalfHingeDistance = maxHingeDistance * this.hingeDistance / 2.0;
+        const tension = Math.min(this.hingeDistance, 0.5);
 
-        // var geometry = new THREE.Geometry();
-        
-        // const ARC_SEGMENTS = 10;
-        // for ( var i = 0; i < ARC_SEGMENTS; i ++ ) {
-        //     geometry.vertices.push( new THREE.Vector3() );
-        // }
+        //BACK HINGE
+        const topALeft = new THREE.Vector3(0 - currentHalfHingeDistance, currentHeight, -.5);
+        const topARight = new THREE.Vector3(0 + currentHalfHingeDistance, currentHeight, -.5);
         
         var positions = [];
-        positions.push(cornerA);
-        positions.push(topA);
-        positions.push(cornerB);
+        positions.push(new THREE.Vector3(cornerA.x + currentHalfHingeOffset, cornerA.y, cornerA.z));
+        positions.push(topALeft);
 
-        var hingeA = this.createHinge(positions, this.hingeMaterial);
+        if(this.hingeDistance > 0.0)
+            positions.push(topARight);
+
+        positions.push(new THREE.Vector3(cornerB.x - currentHalfHingeOffset, cornerB.y, cornerB.z));
+
+        var hingeA = this.createHinge(positions, this.hingeMaterial,tension);
 
         hingeA.position.set(this.position.x + .5 - this.position.x * currentForeShortening * 2, 
                             this.position.y, 
@@ -107,12 +111,20 @@ module.exports = (function() {
         this.scene.add(hingeA);
         this.meshes.push(hingeA);
 
-        positions = [];
-        positions.push(cornerC);
-        positions.push(topB);
-        positions.push(cornerD);
+        //FRONT HINGE
+        const topBLeft = new THREE.Vector3(0 - currentHalfHingeDistance, currentHeight, .5);
+        const topBRight = new THREE.Vector3(0 + currentHalfHingeDistance, currentHeight, .5);
 
-        var hingeB = this.createHinge(positions, this.hingeMaterial);
+        positions = [];
+        positions.push(new THREE.Vector3(cornerC.x - currentHalfHingeOffset, cornerC.y, cornerC.z));
+        positions.push(topBRight);
+        
+        if(this.hingeDistance > 0.0)
+            positions.push(topBLeft);
+
+        positions.push(new THREE.Vector3(cornerD.x + currentHalfHingeOffset, cornerD.y, cornerD.z));
+
+        var hingeB = this.createHinge(positions, this.hingeMaterial, tension);
         
         hingeB.position.set(this.position.x + .5 - this.position.x * currentForeShortening * 2, 
                             this.position.y, 
@@ -148,7 +160,15 @@ module.exports = (function() {
     //note that this value is never smaller than the minimum hinge distance set in controls.js
     Voxel.prototype.updateHingeDistance = function(value)
     {
-        this.tension = value;
+        this.hingeDistance = value;
+    };
+    
+    //tension is a nice way to simulate having multiple hinges.
+    //larger values look like there are two hinges.
+    //note that this value is never smaller than the minimum hinge distance set in controls.js
+    Voxel.prototype.updateHingeOffset = function(value)
+    {
+        this.hingeOffset = value;
     };
 
     Voxel.prototype.updateDrawing = function(scene)

@@ -104,13 +104,19 @@
 			<div class="panel-collapse collapse in" id="params-collapse">
 				<div class="panel-body">
 						<div id="hingeDistance">
-							<input id="setHingeDistance" type="range" min="0.2" max="1" step=".01" value="0" 
+							<input id="setHingeDistance" type="range" min="0" max="1" step=".01" value="0" 
 									data-orientation="horizontal">							
 							<div class="hinge-distance-value">
-								<!-- note that the displayed distance is subtracted by the minimum hinge distance of 0.2 -->
 									hinge distance: <span id="slider-value-hinge-distance">0</span>
 							</div>
-					</div>
+						</div>
+						<div id="hingeOffset">
+							<input id="setHingeOffset" type="range" min="0" max="1" step=".01" value="0" 
+									data-orientation="horizontal">							
+							<div class="hinge-offset-value">
+									hinge offset: <span id="slider-value-hinge-offset">0</span>
+							</div>
+						</div>
 				</div>
 			</div>
 	</div>
