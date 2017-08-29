@@ -10,40 +10,43 @@ module.exports = (function() {
         this.cellCoords = cellCoords;
         this.cellType = cellType;
         this.meshes = [];
+        this.geometries = [];
+        this.materials = [];
         this.compressionRatio = 0;
+
         this.hingeDistance = 0.0;
         this.hingeOffset = 0.0;
         this.hingePosition = 0.0;
-
-        this.hingeMaterial = new THREE.LineBasicMaterial( {
-            color: 0x000000,
-            opacity: 1,
-            linewidth: 2
-            } );
+        
         bind(this);
     }
 
-    Voxel.prototype.createHinge = function(positions, material, tension)
+    Voxel.prototype.createHinge = function(positions, tension)
     {        
         var curve = new THREE.CatmullRomCurve3( positions );
         curve.tension = tension;
         curve.type = "catmullrom";
         curve.closed = false;
 
+        const hingeMaterial = new THREE.LineBasicMaterial( {
+            color: 0x000000,
+            opacity: 1,
+            linewidth: 2
+            } );
+        this.materials.push(hingeMaterial);
+
         var geometry = new THREE.Geometry();
         geometry.vertices = curve.getPoints(30);
+        this.geometries.push(geometry);
 
-        const hinge = new THREE.Line( geometry, material);
+        const hinge = new THREE.Line( geometry, hingeMaterial);
+        
         return hinge;
     }
 
     Voxel.prototype.drawVoxel = function(scene)
     {
-        if(this.scene != null)
-        {
-            for(var i = 0; i < this.meshes.length; i++)
-                this.scene.remove(this.meshes[i]);       
-        }
+        this.removeVoxelFromScene();
 
         this.scene = scene;
 
@@ -52,13 +55,6 @@ module.exports = (function() {
             cellColor = 0x00aa00;
         if(this.cellType == 3)
             cellColor = 0x0000aa;
-
-        var material = new THREE.LineBasicMaterial( {
-            color: 0x000000,
-            linewidth: 5,
-            linecap: 'round', //ignored by WebGLRenderer
-            linejoin:  'round' //ignored by WebGLRenderer
-        } );
 
         const maxForeShortening = .5 * 0.75;
         const currentForeShortening = maxForeShortening * this.compressionRatio;
@@ -83,8 +79,16 @@ module.exports = (function() {
         outlineGeometry.vertices.push(cornerC);
         outlineGeometry.vertices.push(cornerD);
         outlineGeometry.vertices.push(cornerA);
+        this.geometries.push(outlineGeometry);
 
-        const outline = new THREE.Line( outlineGeometry, material );
+        const outlineMaterial = new THREE.LineBasicMaterial( {
+            color: 0x000000,
+            opacity: 1,
+            linewidth: 2
+            } );
+        this.materials.push(outlineMaterial);
+
+        const outline = new THREE.Line( outlineGeometry, outlineMaterial );
         outline.position.set(this.position.x + .5 - this.position.x * currentForeShortening * 2, 
                                 this.position.y, this.position.z + .5);
         this.scene.add(outline);
@@ -111,7 +115,7 @@ module.exports = (function() {
 
         positions.push(new THREE.Vector3(cornerB.x - currentHalfHingeOffset, cornerB.y, cornerB.z));
 
-        var hingeA = this.createHinge(positions, this.hingeMaterial,tension);
+        var hingeA = this.createHinge(positions, tension);
 
         hingeA.position.set(this.position.x + .5 - this.position.x * currentForeShortening * 2, 
                             this.position.y, 
@@ -136,13 +140,53 @@ module.exports = (function() {
 
         positions.push(new THREE.Vector3(cornerD.x + currentHalfHingeOffset, cornerD.y, cornerD.z));
 
-        var hingeB = this.createHinge(positions, this.hingeMaterial, tension);
+        var hingeB = this.createHinge(positions, tension);
         
         hingeB.position.set(this.position.x + .5 - this.position.x * currentForeShortening * 2, 
                             this.position.y, 
                             this.position.z + .5);
         this.scene.add(hingeB);
         this.meshes.push(hingeB);
+
+        //hinge connections
+        var hingeLeftGeometry = new THREE.Geometry();
+        hingeLeftGeometry.vertices.push(topALeft);
+        hingeLeftGeometry.vertices.push(topBLeft);
+        this.geometries.push(hingeLeftGeometry);
+
+        const hingeLeftConnectionMaterial = new THREE.LineBasicMaterial( {
+            color: 0x000000,
+            opacity: 1,
+            linewidth: 2
+            } );
+        this.materials.push(hingeLeftConnectionMaterial);
+
+        const hingeLeft = new THREE.Line( hingeLeftGeometry, hingeLeftConnectionMaterial );
+        hingeLeft.position.set(this.position.x + .5 - this.position.x * currentForeShortening * 2, 
+                                this.position.y, this.position.z + .5);
+        this.scene.add(hingeLeft);
+        this.meshes.push(hingeLeft);
+
+        if(this.hingeDistance > 0.0)
+        {
+            var hingeRightGeometry = new THREE.Geometry();
+            hingeRightGeometry.vertices.push(topARight);
+            hingeRightGeometry.vertices.push(topBRight);
+            this.geometries.push(hingeRightGeometry);
+
+            const hingeRightConnectionMaterial = new THREE.LineBasicMaterial( {
+                color: 0x000000,
+                opacity: 1,
+                linewidth: 2
+                } );
+            this.materials.push(hingeRightConnectionMaterial);        
+
+            const hingeRight = new THREE.Line( hingeRightGeometry, hingeRightConnectionMaterial );
+            hingeRight.position.set(this.position.x + .5 - this.position.x * currentForeShortening * 2, 
+                                    this.position.y, this.position.z + .5);
+            this.scene.add(hingeRight);
+            this.meshes.push(hingeRight);
+        }
 
         // const geometry = new THREE.PlaneGeometry(1.0, 1.0);
         // geometry.rotateX(-90 * THREE.Math.DEG2RAD);
@@ -156,10 +200,25 @@ module.exports = (function() {
         if(this.scene != null)
         {
             for(var i = 0; i < this.meshes.length; i++)
-                this.scene.remove(this.meshes[i]);
+            {
+                const mesh = this.meshes[i];
+                this.scene.remove(mesh);
+                // this.meshes[i].geometry.dispose();
+                // this.meshes[i].dispose();
+            }
+                
+            this.meshes = [];        
 
-            this.meshes = [];            
-        }    
+            for(var j = 0; j < this.geometries.length; j++)
+                this.geometries[j].dispose();
+
+            this.geometries = [];
+
+            for(var k = 0; k < this.materials.length; k++)
+                this.materials[k].dispose();
+
+            this.materials = [];
+        }
     };
     
     Voxel.prototype.updateCompression = function(value)
@@ -167,17 +226,11 @@ module.exports = (function() {
         this.compressionRatio = value;
     };
     
-    //tension is a nice way to simulate having multiple hinges.
-    //larger values look like there are two hinges.
-    //note that this value is never smaller than the minimum hinge distance set in controls.js
     Voxel.prototype.updateHingeDistance = function(value)
     {
         this.hingeDistance = value;
     };
     
-    //tension is a nice way to simulate having multiple hinges.
-    //larger values look like there are two hinges.
-    //note that this value is never smaller than the minimum hinge distance set in controls.js
     Voxel.prototype.updateHingeOffset = function(value)
     {
         this.hingeOffset = value;

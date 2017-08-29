@@ -294,8 +294,8 @@ module.exports = (function() {
 
   VoxelTool.prototype.__defineSetter__('activeBrush', function(activeBrush) {
     this._activeBrush = activeBrush;
-    this.cursor.material.uniforms.image.value = new THREE.Texture(activeBrush.textureIcon);
-    this.cursor.material.uniforms.image.value.needsUpdate = true;
+    // this.cursor.material.uniforms.image.value = new THREE.Texture(activeBrush.textureIcon);
+    // this.cursor.material.uniforms.image.value.needsUpdate = true;
   });
 
   VoxelTool.prototype.alterMouseEvents = function(){
