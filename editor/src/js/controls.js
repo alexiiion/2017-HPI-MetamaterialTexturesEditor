@@ -56,19 +56,38 @@ module.exports = (function() {
 
     $('.voxel-cells-btn').click(this.selectCellType);
     
+    $("#setHingeDistance").on("input change", this.changeHingeDistanceValue);
+
     $("#setCompression").on("input change", this.changeCompressionValue);
-   
+       
     this.parseGridSettings();
   }
-
+  
   Controls.prototype.changeCompressionValue = function(evt) {
     var slider =  $('#setCompression');
     const value = slider.val();
-    $('#slider-value').text(value);
+    $('#slider-value-compression').text(value);
 
     this.voxelModel.updateCompression(value);
 
-    this.renderer.coordinateSystem.visible = !(value > 0);
+    const interactionAvailable = !(value > 0);
+
+    this.renderer.coordinateSystem.visible = interactionAvailable;
+
+    if(interactionAvailable)
+      this.activeTool.activate();
+    else
+      this.activeTool.deactivate();
+  }
+  
+  Controls.prototype.changeHingeDistanceValue = function(evt) {
+    var slider =  $('#setHingeDistance');
+    const minHingeDistance = 0.2;
+    const currentSliderValue = slider.val();
+    const value = Math.max(minHingeDistance, slider.val());
+    $('#slider-value-hinge-distance').text(value);
+
+    this.voxelModel.updateHingeDistance(value);
   }
 
   Controls.prototype.selectTool = function(evt) {

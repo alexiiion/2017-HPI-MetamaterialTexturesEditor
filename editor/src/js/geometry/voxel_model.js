@@ -46,6 +46,14 @@ module.exports = (function() {
             this.elements[i].updateDrawing();
         }
     };
+    VoxelModel.prototype.updateHingeDistance = function(value)
+    {
+        for(var i = 0; i < this.elements.length; i++)
+        {
+            this.elements[i].updateHingeDistance(value);
+            this.elements[i].updateDrawing();
+        }
+    };
 
     VoxelModel.prototype.removeVoxel = function(position, cellCoords)
     {
