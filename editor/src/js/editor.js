@@ -18,7 +18,7 @@ module.exports = (function() {
     threePatch(THREE);
 
     // Maximum dimensions of the voxel grid.
-    const voxelGridSize = new THREE.Vector3(100, 0, 100);
+    const voxelGridSize = new THREE.Vector3(50, 0, 100);
 
     this.renderer = new Renderer(voxelGridSize);
     this.voxelModel = new VoxelModel(this.renderer.scene, voxelGridSize)

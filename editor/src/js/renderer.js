@@ -49,6 +49,9 @@ module.exports = (function() {
     this.grid = new THREE.GridHelper(gridSize / 2, gridSize);
     this.coordinateSystem.add(this.grid);
 
+    //the whole scenes is scaled since the cells are not uniform.
+    this.coordinateSystem.scale.set(2,1,1);
+
     var xGeometry = new THREE.Geometry();
     xGeometry.vertices.push(
       new THREE.Vector3(0, 0, 0),
@@ -76,6 +79,7 @@ module.exports = (function() {
     this.scene.add(this.coordinateSystem);
     
     this.voxelContainer = new THREE.Object3D();
+    this.voxelContainer.scale.set(2,1,1);
     this.scene.add(this.voxelContainer);
   }
 

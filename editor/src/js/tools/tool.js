@@ -19,6 +19,10 @@ module.exports = (function() {
 
     this.scene = new THREE.Object3D();
     this.scene.visible = false;
+
+    //the whole scenes is scaled since the cells are not uniform.
+    this.scene.scale.set(2,1,1);
+    
     this.renderer.scene.add(this.scene);
 
     this.infoBox = $('#voxel-info-box');

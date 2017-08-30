@@ -123,6 +123,9 @@ module.exports = (function() {
       return;
     }
 
+    //the whole scenes is scaled since the cells are not uniform.
+    intersection.x /= 2.0;
+
     this.startPosition = intersection.floor();
     this.startPosition.add(new THREE.Vector3(.5, 0, .5));
     
@@ -151,6 +154,9 @@ module.exports = (function() {
     if(intersection == null)
       return;
 
+    //the whole scenes is scaled since the cells are not uniform.
+    intersection.x /= 2.0;
+    
     // if (this.rotatedMode) {
     //   this.endPosition = intersection.clone().sub(this.startPosition).divideScalar(2.0).ceil().multiplyScalar(2.0);
     //   const rectDirection = this.endPosition.largestComponent();
