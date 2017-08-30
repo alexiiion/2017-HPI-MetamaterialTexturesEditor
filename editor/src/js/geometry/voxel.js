@@ -5,7 +5,7 @@ const bind         = require('../misc/bind');
 
 module.exports = (function() {
 
-    function Voxel(position,cellCoords, cellType) {
+    function Voxel(position,cellCoords, cellType, hingeDistance = 0.0, hingeOffset = 0.0, hingePosition = 0.0, compression = 0.0 ) {
         this.position = position;
         this.cellCoords = cellCoords;
         this.cellType = cellType;
@@ -14,9 +14,9 @@ module.exports = (function() {
         this.materials = [];
         this.compressionRatio = 0;
 
-        this.hingeDistance = 0.0;
-        this.hingeOffset = 0.0;
-        this.hingePosition = 0.0;
+        this.hingeDistance = hingeDistance;
+        this.hingeOffset = hingeOffset;
+        this.hingePosition = hingePosition;
         
         bind(this);
     }
@@ -239,6 +239,16 @@ module.exports = (function() {
     Voxel.prototype.updateHingePosition = function(value)
     {
         this.hingePosition = value;
+    };
+
+    Voxel.prototype.updateParams = function(hingeDistance = 0.0, hingeOffset = 0.0, hingePosition = 0.0)
+    {
+        this.hingeDistance = hingeDistance;
+        this.hingeOffset = hingeOffset;
+        this.hingePosition = hingePosition;
+
+        this.removeVoxelFromScene();
+        this.drawVoxel(this.scene);
     };
 
     Voxel.prototype.updateDrawing = function(scene)

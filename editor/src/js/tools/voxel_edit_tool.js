@@ -56,7 +56,9 @@ module.exports = (function() {
   //   return voxels;
   // }
   VoxelEditTool.prototype.updateVoxel = function(position, cellCoords, cellType) {
-    // const voxel = this.voxelModel.getVoxel(position, cellCoords);
+    const voxel = this.voxelModel.edit(position, cellCoords);
+    return voxel;
+    // const voxel = this.voxelModel.getVoxel (position, cellCoords);
     // var voxel;
     // const voxels = [];
 
