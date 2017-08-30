@@ -16,9 +16,11 @@ module.exports = (function() {
         this.elements = [];
 
         this.compression = 0.0;
-        this.hingeDistance = 0.0;
+        this.hingeDistanceFront = 0.0;
+        this.hingeDistanceBack = 0.0;
         this.hingeOffset = 0.0;
-        this.hingePosition = 0.0;
+        this.hingePositionFront = 0.0;
+        this.hingePositionBack = 0.0;
         
         // this.settings = settings;
     }
@@ -43,7 +45,10 @@ module.exports = (function() {
             return containingVoxel;
 
         var voxel = new Voxel(position, cellCoords, cellType, 
-                                this.hingeDistance, this.hingeOffset, this.hingePosition, this.compression);
+                                this.hingeDistanceFront, this.hingeDistanceBack, 
+                                this.hingeOffset, 
+                                this.hingePositionFront,this.hingePositionBack, 
+                                this.compression);
         this.elements.push(voxel);
         return voxel;        
     };
@@ -85,7 +90,9 @@ module.exports = (function() {
         if(voxel == null)
             return;
 
-        voxel.updateParams(this.hingeDistance, this.hingeOffset,this.hingePosition);
+        voxel.updateParams(this.hingeDistanceFront, this.hingeDistanceBack,
+                            this.hingeOffset,
+                            this.hingePositionFront, this.hingePositionBack);
         voxel.updateDrawing();
     };
 
@@ -100,37 +107,31 @@ module.exports = (function() {
             this.elements[i].updateDrawing();
         }
     };
-
-    VoxelModel.prototype.updateHingeDistance = function(value)
+    
+    VoxelModel.prototype.updateHingeDistanceFront = function(value)
     {
-        this.hingeDistance = value;
-
-        // for(var i = 0; i < this.elements.length; i++)
-        // {
-        //     this.elements[i].updateHingeDistance(value);
-        //     this.elements[i].updateDrawing();
-        // }
+        this.hingeDistanceFront = value;
     };
+
+
+    VoxelModel.prototype.updateHingeDistanceBack = function(value)
+    {
+        this.hingeDistanceBack = value;
+    };
+        
     VoxelModel.prototype.updateHingeOffset = function(value)
     {
         this.hingeOffset = value;
-
-        // for(var i = 0; i < this.elements.length; i++)
-        // {
-        //     this.elements[i].updateHingeOffset(value);
-        //     this.elements[i].updateDrawing();
-        // }
     }; 
-
-    VoxelModel.prototype.updateHingePosition = function(value)
+    
+    VoxelModel.prototype.updateHingePositionFront = function(value)
     {
-        this.hingePosition = value;
-
-        // for(var i = 0; i < this.elements.length; i++)
-        // {
-        //     this.elements[i].updateHingePosition(value);
-        //     this.elements[i].updateDrawing();
-        // }
+        this.hingePositionFront = value;
+    }; 
+        
+    VoxelModel.prototype.updateHingePositionBack = function(value)
+    {
+        this.hingePositionBack = value;
     }; 
 
     VoxelModel.prototype.export = function() {

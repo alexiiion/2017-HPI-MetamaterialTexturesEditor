@@ -56,9 +56,11 @@ module.exports = (function() {
 
     $('.voxel-cells-btn').click(this.selectCellType);
     
-    $("#setHingeDistance").on("input change", this.changeHingeDistanceValue);
+    $("#setHingeDistanceFront").on("input change", this.changeHingeDistanceFrontValue);
+    $("#setHingeDistanceBack").on("input change", this.changeHingeDistanceBackValue);
     $("#setHingeOffset").on("input change", this.changeHingeOffsetValue);
-    $("#setHingePosition").on("input change", this.changeHingePositionValue);
+    $("#setHingePositionFront").on("input change", this.changeHingePositionFrontValue);
+    $("#setHingePositionBack").on("input change", this.changeHingePositionBackValue);
 
     $("#setCompression").on("input change", this.changeCompressionValue);
     
@@ -82,12 +84,20 @@ module.exports = (function() {
       this.activeTool.deactivate();
   }
   
-  Controls.prototype.changeHingeDistanceValue = function(evt) {
-    var slider =  $('#setHingeDistance');
+  Controls.prototype.changeHingeDistanceFrontValue = function(evt) {
+    var slider =  $('#setHingeDistanceFront');
     const value = slider.val();
-    $('#slider-value-hinge-distance').text(value);
+    $('#slider-value-hinge-distance-front').text(value);
 
-    this.voxelModel.updateHingeDistance(value);
+    this.voxelModel.updateHingeDistanceFront(value);
+  }
+  
+  Controls.prototype.changeHingeDistanceBackValue = function(evt) {
+    var slider =  $('#setHingeDistanceBack');
+    const value = slider.val();
+    $('#slider-value-hinge-distance-back').text(value);
+
+    this.voxelModel.updateHingeDistanceBack(value);
   }
   
   Controls.prototype.changeHingeOffsetValue = function(evt) {
@@ -98,14 +108,21 @@ module.exports = (function() {
     this.voxelModel.updateHingeOffset(value);
   }
   
-  Controls.prototype.changeHingePositionValue = function(evt) {
-    var slider =  $('#setHingePosition');
+  Controls.prototype.changeHingePositionFrontValue = function(evt) {
+    var slider =  $('#setHingePositionFront');
     const value = slider.val();
-    $('#slider-value-hinge-position').text(value);
+    $('#slider-value-hinge-position-front').text(value);
 
-    this.voxelModel.updateHingePosition(value);
+    this.voxelModel.updateHingePositionFront(value);
   }
   
+  Controls.prototype.changeHingePositionBackValue = function(evt) {
+    var slider =  $('#setHingePositionBack');
+    const value = slider.val();
+    $('#slider-value-hinge-position-back').text(value);
+
+    this.voxelModel.updateHingePositionBack(value);
+  }  
 
   Controls.prototype.selectTool = function(evt) {
     const toolName = typeof evt == 'string' ? evt : evt.currentTarget.id.slice(6, -4);

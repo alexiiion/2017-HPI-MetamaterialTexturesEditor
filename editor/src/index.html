@@ -32,14 +32,14 @@
 						<div class="voxel-btn-selection"></div><img alt="edit" src="./img/mode_edit.png"></div>
 						<p>edit</p>
 					</div>
-					<div id="voxel-tool-spacer"></div>
+					<!-- <div id="voxel-tool-spacer"></div>
 					<div class="voxel-btn voxel-mode-btn" id="voxel-mirror-btn">
 						<div class="voxel-btn-img">
 							<div class="voxel-btn-selection"></div>
 							<img alt="mirrow" src="./img/mode_mirror.png">
 							</div>
 						<p>mirror</p>
-					</div>
+					</div> -->
 				</div>
 			</div>
 		</div>
@@ -103,25 +103,40 @@
 			</div>
 			<div class="panel-collapse collapse in" id="params-collapse">
 				<div class="panel-body">
-						<div id="hingeDistance">
-							<input id="setHingeDistance" type="range" min="0" max="1" step=".01" value="0" 
+						<div id="hingeDistanceFront" style="margin-bottom:10px;">
+							<input id="setHingeDistanceFront" type="range" min="0" max="1" step=".01" value="0" 
 									data-orientation="horizontal">							
-							<div class="hinge-distance-value">
-									hinge distance: <span id="slider-value-hinge-distance">0</span>
+							<div class="hinge-distance-front-value">
+									hinge front distance: <span id="slider-value-hinge-distance-front">0</span>
 							</div>
 						</div>
-						<div id="hingeOffset">
+						<div id="hingeDistanceBack" style="margin-bottom:10px;">
+							<input id="setHingeDistanceBack" type="range" min="0" max="1" step=".01" value="0" 
+									data-orientation="horizontal">							
+							<div class="hinge-distance-back-value">
+									hinge back distance: <span id="slider-value-hinge-distance-back">0</span>
+							</div>
+						</div>
+						<div id="hingeOffset" style="margin-bottom:10px;">
 							<input id="setHingeOffset" type="range" min="0" max="1" step=".01" value="0" 
 									data-orientation="horizontal">							
 							<div class="hinge-offset-value">
 									hinge offset: <span id="slider-value-hinge-offset">0</span>
 							</div>
 						</div>
-						<div id="hingePosition">
-							<input id="setHingePosition" type="range" min="-1" max="1" step=".01" value="0" 
+						<div id="hingePositionFront" style="margin-bottom:10px;">
+							<input id="setHingePositionFront" type="range" min="-1" max="1" step=".01" value="0" 
 									data-orientation="horizontal">							
-							<div class="hinge-position-value">
-									hinge position: <span id="slider-value-hinge-position">0</span>
+							<div class="hinge-position-front-value">
+									hinge front position: <span id="slider-value-hinge-position-front">0</span>
+							</div>
+						</div>
+						
+						<div id="hingePositionBack" style="margin-bottom:10px;">
+							<input id="setHingePositionBack" type="range" min="-1" max="1" step=".01" value="0" 
+									data-orientation="horizontal">							
+							<div class="hinge-position-back-value">
+									hinge back position: <span id="slider-value-hinge-position-back">0</span>
 							</div>
 						</div>
 				</div>
