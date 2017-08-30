@@ -9,6 +9,10 @@ const bind               = require('./misc/bind');
 const VoxelAddTool       = require('./tools/voxel_add_tool');
 const VoxelDeleteTool    = require('./tools/voxel_delete_tool');
 const VoxelEditTool      = require('./tools/voxel_edit_tool');
+const Voxel              = require('./geometry/voxel');
+
+const THREE             = require('three');
+const OrbitControls     = require('three-orbit-controls')(THREE);
 
 module.exports = (function() {
 
@@ -24,6 +28,39 @@ module.exports = (function() {
 
     this.pressedKeys = {};
 
+    this.previewCanvas = document.getElementById('cell-preview-canvas');
+    const gl = this.previewCanvas.getContext('webgl');
+
+    this.previewRenderer = new THREE.WebGLRenderer({ canvas: this.previewCanvas, context: gl });
+    this.previewRenderer.setClearColor(0xffffff);
+    this.previewRenderer.sortObjects = false;
+    this.previewRenderer.setPixelRatio(window.devicePixelRatio);
+    this.previewRenderer.setSize(200, 80);
+
+    // Create camera.
+    this.previewCamera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
+    this.previewCamera.position.set(0.0, 2.0, 2.0);
+
+    // Create orbit controls.
+    this.previewControls = new OrbitControls(this.previewCamera, this.previewRenderer.domElement);
+    this.previewControls.rotateSpeed = 0.2;
+    this.previewControls.zoomSpeed = 0.5;
+    this.previewControls.panSpeed = 0.5;
+    this.previewControls.enableDamping = true;
+    this.previewControls.dampingFactor = 0.4;
+
+    // Create and populate scene.
+    this.previewScene = new THREE.Scene();
+
+    // Create light and add to scene.
+    const light = new THREE.DirectionalLight(0xffffff);
+    light.position.set(0.0, 1, 2.0);
+    this.previewScene.add(light);
+
+    this.previewVoxel = new Voxel(new THREE.Vector3(0,0,0), new THREE.Vector2(0,0))
+    this.previewVoxel.updateCompression(.5);
+    this.previewVoxel.drawVoxel(this.previewScene);
+
     $('#voxel-import-btn').click(this.import);
     $('#voxel-export-btn').click(this.export);
 
@@ -37,7 +74,7 @@ module.exports = (function() {
     $('#voxel-mirror-btn').click(this.toggleMirrorMode);
     // $('.voxel-stiffness-btn').click(this.selectStiffness);
 
-        window.addEventListener('keydown', this.onKeyDown);
+    window.addEventListener('keydown', this.onKeyDown);
     window.addEventListener('keyup', this.onKeyUp);
 
     this.activeTool = this.tools['add-tool'];
@@ -90,6 +127,9 @@ module.exports = (function() {
     $('#slider-value-hinge-distance-front').text(value);
 
     this.voxelModel.updateHingeDistanceFront(value);
+    
+    this.previewVoxel.updateHingeDistanceFront(value);
+    this.previewVoxel.updateDrawing();
   }
   
   Controls.prototype.changeHingeDistanceBackValue = function(evt) {
@@ -98,6 +138,9 @@ module.exports = (function() {
     $('#slider-value-hinge-distance-back').text(value);
 
     this.voxelModel.updateHingeDistanceBack(value);
+    
+    this.previewVoxel.updateHingeDistanceBack(value);
+    this.previewVoxel.updateDrawing();
   }
   
   Controls.prototype.changeHingeOffsetValue = function(evt) {
@@ -106,6 +149,9 @@ module.exports = (function() {
     $('#slider-value-hinge-offset').text(value);
 
     this.voxelModel.updateHingeOffset(value);
+    
+    this.previewVoxel.updateHingeOffset(value);
+    this.previewVoxel.updateDrawing();
   }
   
   Controls.prototype.changeHingePositionFrontValue = function(evt) {
@@ -114,6 +160,9 @@ module.exports = (function() {
     $('#slider-value-hinge-position-front').text(value);
 
     this.voxelModel.updateHingePositionFront(value);
+    
+    this.previewVoxel.updateHingePositionFront(value);
+    this.previewVoxel.updateDrawing();
   }
   
   Controls.prototype.changeHingePositionBackValue = function(evt) {
@@ -122,6 +171,9 @@ module.exports = (function() {
     $('#slider-value-hinge-position-back').text(value);
 
     this.voxelModel.updateHingePositionBack(value);
+    
+    this.previewVoxel.updateHingePositionBack(value);
+    this.previewVoxel.updateDrawing();
   }  
 
   Controls.prototype.selectTool = function(evt) {
@@ -189,7 +241,7 @@ module.exports = (function() {
         this.selectTool('add-tool');
         break;
     }
-  }
+  } 
 
   Controls.prototype.selectStiffness = function(evt) {
     const stiffness = parseInt(evt.currentTarget.id.slice(16, -4)) / 100.0;

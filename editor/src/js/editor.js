@@ -27,6 +27,8 @@ module.exports = (function() {
 
   Editor.prototype.run = function() {
     this.renderer.update();
+    
+    this.controls.previewRenderer.render(this.controls.previewScene, this.controls.previewCamera);
     requestAnimationFrame(this.run);
   }
 

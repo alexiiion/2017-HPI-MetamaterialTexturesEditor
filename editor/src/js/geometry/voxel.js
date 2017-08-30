@@ -242,7 +242,7 @@ module.exports = (function() {
     
     Voxel.prototype.updateHingeDistanceFront = function(value)
     {
-        this.hingeDistanceBack = value;
+        this.hingeDistanceFront = value;
     };
 
     Voxel.prototype.updateHingeDistanceBack = function(value)
