@@ -2,17 +2,17 @@
 
 const THREE        = require('three');
 const bind         = require('../misc/bind');
+const constants    = require('../constants');
 
 module.exports = (function() {
 
-    function Voxel(position,cellCoords, cellType, 
+    function Voxel(position,cellCoords,
                     hingeDistanceFront = 0.0, hingeDistanceBack = 0.0, 
                     hingeOffset = 0.0, 
                     hingePositionFront = 0.0, hingePositionBack = 0.0, 
                     compression = 0.0 ) {
         this.position = position;
         this.cellCoords = cellCoords;
-        this.cellType = cellType;
         this.meshes = [];
         this.geometries = [];
         this.materials = [];
@@ -40,7 +40,7 @@ module.exports = (function() {
         const hingeMaterial = new THREE.LineBasicMaterial( {
             color: 0x000000,
             opacity: 1,
-            linewidth: 2
+            linewidth: constants.HINGE_LINE_WIDTH
             } );
         this.materials.push(hingeMaterial);
 
@@ -59,34 +59,28 @@ module.exports = (function() {
 
         this.scene = scene;
 
-        var cellColor = 0xaa0000;
-        if(this.cellType == 2)
-            cellColor = 0x00aa00;
-        if(this.cellType == 3)
-            cellColor = 0x0000aa;
-
-        const maxForeShortening = this.voxelHalfSize.x * 0.75;
+        const maxForeShortening = this.voxelHalfSize.x * constants.MAX_FORESHORTENING_PERC
         const currentForeShortening = maxForeShortening * this.compressionRatio;
         const currentLength = this.voxelHalfSize.x - currentForeShortening;
         const currentHeight = Math.sqrt(Math.pow(this.voxelHalfSize.x, 2) - Math.pow(currentLength, 2));
 
-        const maxHingeOffset = this.voxelHalfSize.x * 0.5;
+        const maxHingeOffset = this.voxelHalfSize.x * constants.MAX_HINGE_OFFSET_PERC;
         const currentHalfHingeOffset = maxHingeOffset * this.hingeOffset;
 
-        const maxHingePosition = this.voxelHalfSize.x * .5;
+        const maxHingePosition = this.voxelHalfSize.x * constants.MAX_HINGE_POSITION_PERC;
         const currentHalfHingePositionFront = maxHingePosition * this.hingePositionFront;
         const currentHalfHingePositionBack = maxHingePosition * this.hingePositionBack;
 
-        const maxHingeDistance = maxForeShortening * 0.5;
+        const maxHingeDistance = maxForeShortening * constants.MAX_HINGE_DISTANCE_PERC;
         const currentHalfHingeDistanceFront = maxHingeDistance * this.hingeDistanceFront / 2.0;
         const currentHalfHingeDistanceBack = maxHingeDistance * this.hingeDistanceBack / 2.0;
-        const tensionFront = Math.min(this.hingeDistanceFront, 0.5);
-        const tensionBack = Math.min(this.hingeDistanceBack, 0.5);
+        const tensionFront = Math.min(this.hingeDistanceFront, constants.MAX_TENSION);
+        const tensionBack = Math.min(this.hingeDistanceBack, constants.MAX_TENSION);
 
-        const cornerA = new THREE.Vector3(-currentLength, 0, -.5);
-        const cornerB = new THREE.Vector3(currentLength, 0, -.5);
-        const cornerC = new THREE.Vector3(currentLength, 0, .5);
-        const cornerD = new THREE.Vector3(-currentLength, 0, .5);
+        const cornerA = new THREE.Vector3(-currentLength, 0, -this.voxelHalfSize.y);
+        const cornerB = new THREE.Vector3(currentLength,  0, -this.voxelHalfSize.y);
+        const cornerC = new THREE.Vector3(currentLength,  0,  this.voxelHalfSize.y);
+        const cornerD = new THREE.Vector3(-currentLength, 0,  this.voxelHalfSize.y);
 
         //outline
         var outlineGeometry = new THREE.Geometry();
@@ -100,7 +94,7 @@ module.exports = (function() {
         const outlineMaterial = new THREE.LineBasicMaterial( {
             color: 0x000000,
             opacity: 1,
-            linewidth: 2
+            linewidth: constants.OUTLINE_LINE_WIDTH
             } );
         this.materials.push(outlineMaterial);
 
@@ -169,7 +163,7 @@ module.exports = (function() {
         const hingeLeftConnectionMaterial = new THREE.LineBasicMaterial( {
             color: 0x000000,
             opacity: 1,
-            linewidth: 2
+            linewidth: constants.HINGE_LINE_WIDTH
             } );
         this.materials.push(hingeLeftConnectionMaterial);
 
@@ -179,7 +173,7 @@ module.exports = (function() {
         this.scene.add(hingeLeft);
         this.meshes.push(hingeLeft);
 
-        if(this.hingeDistanceFront + this.hingeDistanceBack > 0.0)
+        if(this.hingeDistanceFront > 0.0 || this.hingeDistanceBack > 0.0)
         {
             var hingeRightGeometry = new THREE.Geometry();
             hingeRightGeometry.vertices.push(topARight);
@@ -189,7 +183,7 @@ module.exports = (function() {
             const hingeRightConnectionMaterial = new THREE.LineBasicMaterial( {
                 color: 0x000000,
                 opacity: 1,
-                linewidth: 2
+                linewidth: constants.HINGE_LINE_WIDTH
                 } );
             this.materials.push(hingeRightConnectionMaterial);        
 

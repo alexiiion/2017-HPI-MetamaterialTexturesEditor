@@ -174,9 +174,10 @@ module.exports = (function() {
 
   Controls.prototype.setCurrentCellType = function(cellType)
   {
-    this.tools['add-tool'].setCurrentCellType(cellType);
-    this.tools['delete-tool'].setCurrentCellType(cellType);
-    this.tools['edit-tool'].setCurrentCellType(cellType);
+    // UNUSED
+    // this.tools['add-tool'].setCurrentCellType(cellType);
+    // this.tools['delete-tool'].setCurrentCellType(cellType);
+    // this.tools['edit-tool'].setCurrentCellType(cellType);
   }
 
   Controls.prototype.toggleAddDelete = function() {

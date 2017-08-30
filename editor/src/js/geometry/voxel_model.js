@@ -39,12 +39,12 @@ module.exports = (function() {
         //perform sanity checks and other functions (e.g. merge) here.
     };
     
-    VoxelModel.prototype.add = function(position, cellCoords, cellType){
+    VoxelModel.prototype.add = function(position, cellCoords){
         var containingVoxel = this.tryGetVoxel(position, cellCoords);
         if(containingVoxel != null)
             return containingVoxel;
 
-        var voxel = new Voxel(position, cellCoords, cellType, 
+        var voxel = new Voxel(position, cellCoords, 
                                 this.hingeDistanceFront, this.hingeDistanceBack, 
                                 this.hingeOffset, 
                                 this.hingePositionFront,this.hingePositionBack, 
@@ -83,7 +83,7 @@ module.exports = (function() {
         return null;   
     };
 
-    VoxelModel.prototype.edit = function(position, cellCoords, cellType)
+    VoxelModel.prototype.edit = function(position, cellCoords)
     {
         var voxel = this.tryGetVoxel(position, cellCoords);
 

@@ -2,6 +2,7 @@
 
 const bind  = require('../misc/bind');
 const Tool  = require('./tool');
+const constants = require("../constants");
 // const addBorderingIfNeeded = require('./bordering');
 
 const $     = require('jquery');
@@ -23,8 +24,6 @@ module.exports = (function() {
     this.allowCube = true;
     this.cursorBorder = 0.0;
     this.stiffness = 0.01;
-
-    this.cellType = 0;
 
     this.minPosition = new THREE.Vector3(
       -(this.voxelModel.size.x / 2 - 0.5),
@@ -63,11 +62,6 @@ module.exports = (function() {
     const cursor = new THREE.Mesh(geometry, material);
     return cursor;
   }
-
-  VoxelTool.prototype.setCurrentCellType = function(cellType)
-  {
-    this.cellType = cellType;
-  };
 
   VoxelTool.prototype.setRectMode = function(enableRect)
   {
@@ -124,7 +118,9 @@ module.exports = (function() {
     }
 
     //the whole scenes is scaled since the cells are not uniform.
-    intersection.x /= 2.0;
+    intersection.x /= constants.SCALE_X;
+    intersection.Y /= constants.SCALE_Y;
+    intersection.Z /= constants.SCALE_Z;
 
     this.startPosition = intersection.floor();
     this.startPosition.add(new THREE.Vector3(.5, 0, .5));
@@ -155,7 +151,9 @@ module.exports = (function() {
       return;
 
     //the whole scenes is scaled since the cells are not uniform.
-    intersection.x /= 2.0;
+    intersection.x /= constants.SCALE_X;
+    intersection.Y /= constants.SCALE_Y;
+    intersection.Z /= constants.SCALE_Z;
     
     // if (this.rotatedMode) {
     //   this.endPosition = intersection.clone().sub(this.startPosition).divideScalar(2.0).ceil().multiplyScalar(2.0);
@@ -277,7 +275,7 @@ module.exports = (function() {
     const cellCoords = [offset.y, offset.x];
     // const features = this.activeBrush.cells[cellCoords].mirroredFeatures;
 
-    return this.updateVoxel(position, cellCoords, this.cellType);
+    return this.updateVoxel(position, cellCoords);
 
     // return _.flatten(positions.map(function(mirroredPosition) {
     //   const mirrorFactor = mirroredPosition.getComponent(this.extrusionComponent) / position.getComponent(this.extrusionComponent);

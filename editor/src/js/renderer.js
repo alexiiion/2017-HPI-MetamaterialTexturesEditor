@@ -4,6 +4,7 @@ const THREE             = require('three');
 const OrbitControls     = require('three-orbit-controls')(THREE);
 
 const bind              = require('./misc/bind');
+const constants         = require("./constants");
 
 module.exports = (function() {
 
@@ -50,7 +51,7 @@ module.exports = (function() {
     this.coordinateSystem.add(this.grid);
 
     //the whole scenes is scaled since the cells are not uniform.
-    this.coordinateSystem.scale.set(2,1,1);
+    this.coordinateSystem.scale.set(constants.SCALE_X,constants.SCALE_Y,constants.SCALE_Z);
 
     var xGeometry = new THREE.Geometry();
     xGeometry.vertices.push(

@@ -1,6 +1,7 @@
 'use strict';
 
 const bind  = require('../misc/bind');
+const constants = require("../constants");
 
 const _     = require('lodash');
 const $     = require('jquery');
@@ -21,8 +22,8 @@ module.exports = (function() {
     this.scene.visible = false;
 
     //the whole scenes is scaled since the cells are not uniform.
-    this.scene.scale.set(2,1,1);
-    
+    this.scene.scale.set(constants.SCALE_X,constants.SCALE_Y,constants.SCALE_Z);
+
     this.renderer.scene.add(this.scene);
 
     this.infoBox = $('#voxel-info-box');
