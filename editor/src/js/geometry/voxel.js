@@ -18,6 +18,9 @@ module.exports = (function() {
         this.materials = [];
         this.compressionRatio = 0;
 
+        this.voxelSize = new THREE.Vector2(1, 1);
+        this.voxelHalfSize = new THREE.Vector2(0.5, 0.5);
+
         this.hingeDistanceFront = hingeDistanceFront;
         this.hingeDistanceBack = hingeDistanceBack;
         this.hingeOffset = hingeOffset;
@@ -62,15 +65,15 @@ module.exports = (function() {
         if(this.cellType == 3)
             cellColor = 0x0000aa;
 
-        const maxForeShortening = .5 * 0.75;
+        const maxForeShortening = this.voxelHalfSize.x * 0.75;
         const currentForeShortening = maxForeShortening * this.compressionRatio;
-        const currentLength = .5 - currentForeShortening;
-        const currentHeight = Math.sqrt(Math.pow(.5, 2) - Math.pow(currentLength, 2));
+        const currentLength = this.voxelHalfSize.x - currentForeShortening;
+        const currentHeight = Math.sqrt(Math.pow(this.voxelHalfSize.x, 2) - Math.pow(currentLength, 2));
 
-        const maxHingeOffset = .5 * 0.5;
+        const maxHingeOffset = this.voxelHalfSize.x * 0.5;
         const currentHalfHingeOffset = maxHingeOffset * this.hingeOffset;
 
-        const maxHingePosition = .5 * .5;
+        const maxHingePosition = this.voxelHalfSize.x * .5;
         const currentHalfHingePositionFront = maxHingePosition * this.hingePositionFront;
         const currentHalfHingePositionBack = maxHingePosition * this.hingePositionBack;
 
@@ -102,18 +105,18 @@ module.exports = (function() {
         this.materials.push(outlineMaterial);
 
         const outline = new THREE.Line( outlineGeometry, outlineMaterial );
-        outline.position.set(this.position.x + .5 - this.position.x * currentForeShortening * 2, 
-                                this.position.y, this.position.z + .5);
+        outline.position.set(this.position.x + this.voxelHalfSize.x - this.position.x * currentForeShortening * 2, 
+                                this.position.y, this.position.z + this.voxelHalfSize.y);
         this.scene.add(outline);
         this.meshes.push(outline);
         
         //BACK HINGE
         const topALeft = new THREE.Vector3(0 - currentHalfHingeDistanceBack + currentHalfHingePositionBack, 
                                             currentHeight, 
-                                            -.5);
+                                            -this.voxelHalfSize.y);
         const topARight = new THREE.Vector3(0 + currentHalfHingeDistanceBack + currentHalfHingePositionBack, 
                                             currentHeight, 
-                                            -.5);
+                                            -this.voxelHalfSize.y);
         
         var positions = [];
         positions.push(new THREE.Vector3(cornerA.x + currentHalfHingeOffset, cornerA.y, cornerA.z));
@@ -126,19 +129,19 @@ module.exports = (function() {
 
         var hingeA = this.createHinge(positions, tensionBack);
 
-        hingeA.position.set(this.position.x + .5 - this.position.x * currentForeShortening * 2, 
+        hingeA.position.set(this.position.x + this.voxelHalfSize.x - this.position.x * currentForeShortening * 2, 
                             this.position.y, 
-                            this.position.z + .5);
+                            this.position.z + this.voxelHalfSize.y);
         this.scene.add(hingeA);
         this.meshes.push(hingeA);
 
         //FRONT HINGE
         const topBLeft = new THREE.Vector3(0 - currentHalfHingeDistanceFront +  currentHalfHingePositionFront, 
                                             currentHeight, 
-                                            .5);
+                                            this.voxelHalfSize.y);
         const topBRight = new THREE.Vector3(0 + currentHalfHingeDistanceFront +  currentHalfHingePositionFront, 
                                             currentHeight, 
-                                            .5);
+                                            this.voxelHalfSize.y);
 
         positions = [];
         positions.push(new THREE.Vector3(cornerC.x - currentHalfHingeOffset, cornerC.y, cornerC.z));
@@ -151,9 +154,9 @@ module.exports = (function() {
 
         var hingeB = this.createHinge(positions, tensionFront);
         
-        hingeB.position.set(this.position.x + .5 - this.position.x * currentForeShortening * 2, 
+        hingeB.position.set(this.position.x + this.voxelHalfSize.x - this.position.x * currentForeShortening * 2, 
                             this.position.y, 
-                            this.position.z + .5);
+                            this.position.z + this.voxelHalfSize.y);
         this.scene.add(hingeB);
         this.meshes.push(hingeB);
 
@@ -171,8 +174,8 @@ module.exports = (function() {
         this.materials.push(hingeLeftConnectionMaterial);
 
         const hingeLeft = new THREE.Line( hingeLeftGeometry, hingeLeftConnectionMaterial );
-        hingeLeft.position.set(this.position.x + .5 - this.position.x * currentForeShortening * 2, 
-                                this.position.y, this.position.z + .5);
+        hingeLeft.position.set(this.position.x + this.voxelHalfSize.x - this.position.x * currentForeShortening * 2, 
+                                this.position.y, this.position.z + this.voxelHalfSize.y);
         this.scene.add(hingeLeft);
         this.meshes.push(hingeLeft);
 
@@ -191,8 +194,8 @@ module.exports = (function() {
             this.materials.push(hingeRightConnectionMaterial);        
 
             const hingeRight = new THREE.Line( hingeRightGeometry, hingeRightConnectionMaterial );
-            hingeRight.position.set(this.position.x + .5 - this.position.x * currentForeShortening * 2, 
-                                    this.position.y, this.position.z + .5);
+            hingeRight.position.set(this.position.x + this.voxelHalfSize.x - this.position.x * currentForeShortening * 2, 
+                                    this.position.y, this.position.z + this.voxelHalfSize.y);
             this.scene.add(hingeRight);
             this.meshes.push(hingeRight);
         }
@@ -206,8 +209,8 @@ module.exports = (function() {
         this.materials.push(planeMaterial);
         
         var planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
-        planeMesh.position.set(this.position.x + .5 - this.position.x * currentForeShortening * 2, 
-            this.position.y, this.position.z + .5);
+        planeMesh.position.set(this.position.x + this.voxelHalfSize.x - this.position.x * currentForeShortening * 2, 
+            this.position.y, this.position.z + this.voxelHalfSize.y);
         this.scene.add(planeMesh);
         this.meshes.push(planeMesh);
     }
